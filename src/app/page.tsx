@@ -2,24 +2,24 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { CashierHeader } from '../../presentation/components/cashier/CashierHeader';
-import { ProductGrid } from '../../presentation/components/cashier/ProductGrid';
-import { CartPanel } from '../../presentation/components/cashier/CartPanel';
-import { PaymentModal } from '../../presentation/components/cashier/PaymentModal';
-import { ThermalReceiptModal } from '../../presentation/components/cashier/ThermalReceiptModal';
-import { ModifierModal } from '../../presentation/components/cashier/ModifierModal';
-import { StaffAssignModal } from '../../presentation/components/cashier/StaffAssignModal';
-import { TableSelectModal } from '../../presentation/components/cashier/TableSelectModal';
-import { CustomerSelectModal } from '../../presentation/components/cashier/CustomerSelectModal';
-import { ShiftModal } from '../../presentation/components/cashier/ShiftModal';
-import { ShortcutHelpModal } from '../../presentation/components/cashier/ShortcutHelpModal';
-import { PettyCashModal } from '../../presentation/components/cashier/PettyCashModal';
-import { Product } from '../../core/entities/product';
-import { StaffMember } from '../../core/entities/staff';
-import { SelectedModifier } from '../../core/entities/order';
-import { usePosStore } from '../../presentation/store/pos-store';
-import { useAuthStore } from '../../presentation/store/auth-store';
-import { useCashierShortcuts } from '../../presentation/hooks/useCashierShortcuts';
+import { CashierHeader } from '@/presentation/components/cashier/CashierHeader';
+import { ProductGrid } from '@/presentation/components/cashier/ProductGrid';
+import { CartPanel } from '@/presentation/components/cashier/CartPanel';
+import { PaymentModal } from '@/presentation/components/cashier/PaymentModal';
+import { ThermalReceiptModal } from '@/presentation/components/cashier/ThermalReceiptModal';
+import { ModifierModal } from '@/presentation/components/cashier/ModifierModal';
+import { StaffAssignModal } from '@/presentation/components/cashier/StaffAssignModal';
+import { TableSelectModal } from '@/presentation/components/cashier/TableSelectModal';
+import { CustomerSelectModal } from '@/presentation/components/cashier/CustomerSelectModal';
+import { ShiftModal } from '@/presentation/components/cashier/ShiftModal';
+import { ShortcutHelpModal } from '@/presentation/components/cashier/ShortcutHelpModal';
+import { PettyCashModal } from '@/presentation/components/cashier/PettyCashModal';
+import { Product } from '@/core/entities/product';
+import { StaffMember } from '@/core/entities/staff';
+import { SelectedModifier } from '@/core/entities/order';
+import { usePosStore } from '@/presentation/store/pos-store';
+import { useAuthStore } from '@/presentation/store/auth-store';
+import { useCashierShortcuts } from '@/presentation/hooks/useCashierShortcuts';
 
 export default function PosCashierPage() {
   const router = useRouter();
