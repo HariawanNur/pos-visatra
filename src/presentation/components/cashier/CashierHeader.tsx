@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ShoppingBag,
   Store,
@@ -14,9 +15,12 @@ import {
   Keyboard,
   ShieldCheck,
   Wallet,
+  LogOut,
+  User,
 } from 'lucide-react';
 import { usePosStore } from '../../store/pos-store';
 import { useBusinessStore } from '../../store/business-store';
+import { useAuthStore } from '../../store/auth-store';
 import { IndustryMode } from '../../../core/types/industry';
 
 interface CashierHeaderProps {
@@ -30,8 +34,15 @@ export const CashierHeader: React.FC<CashierHeaderProps> = ({
   onOpenShortcutHelp,
   onOpenPettyCashModal,
 }) => {
+  const router = useRouter();
   const { industryMode, setIndustryMode } = usePosStore();
   const { config, currentShift } = useBusinessStore();
+  const { currentUser, logout, activeOutlet } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
 
   const modeButtons: { mode: IndustryMode; label: string; icon: React.ReactNode }[] = [
     { mode: 'HYBRID', label: 'Universal (All)', icon: <Layers className="w-4 h-4" /> },
@@ -61,7 +72,7 @@ export const CashierHeader: React.FC<CashierHeaderProps> = ({
             <ShieldCheck className="w-3.5 h-3.5 text-cyan-400 inline" />
             <span className="font-medium text-slate-300">{config.companyLegalName}</span>
             <span className="text-slate-600">•</span>
-            <span className="text-slate-400">{config.storeName}</span>
+            <span className="text-cyan-400 font-semibold">{activeOutlet ? activeOutlet.name : config.storeName}</span>
           </div>
         </div>
       </div>
@@ -87,7 +98,7 @@ export const CashierHeader: React.FC<CashierHeaderProps> = ({
         })}
       </div>
 
-      {/* Action Controls & Cashier Info */}
+      {/* Action Controls, User Profile & Cashier Info */}
       <div className="flex items-center gap-2">
         {/* Petty Cash Button */}
         <button
@@ -123,7 +134,7 @@ export const CashierHeader: React.FC<CashierHeaderProps> = ({
           </div>
         </button>
 
-        {/* Link to Admin Backoffice */}
+        {/* Link to Admin Backoffice (if owner or manager) */}
         <Link
           href="/dashboard"
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-blue-600 text-slate-200 hover:text-white border border-slate-700 hover:border-blue-500 text-xs font-medium transition"
@@ -131,6 +142,29 @@ export const CashierHeader: React.FC<CashierHeaderProps> = ({
           <LayoutDashboard className="w-4 h-4" />
           <span className="hidden sm:inline">Backoffice</span>
         </Link>
+
+        {/* User profile avatar & logout */}
+        {currentUser ? (
+          <div className="flex items-center gap-1.5 pl-1 border-l border-slate-800">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-700 to-cyan-600 text-white font-bold text-xs flex items-center justify-center shadow">
+              {currentUser.avatarInitials}
+            </div>
+            <button
+              onClick={handleLogout}
+              title="Keluar / Ganti Akun Demo"
+              className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-500 transition"
+          >
+            Login
+          </Link>
+        )}
       </div>
     </header>
   );

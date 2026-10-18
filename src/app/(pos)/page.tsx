@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { CashierHeader } from '../../presentation/components/cashier/CashierHeader';
 import { ProductGrid } from '../../presentation/components/cashier/ProductGrid';
 import { CartPanel } from '../../presentation/components/cashier/CartPanel';
@@ -17,10 +18,19 @@ import { Product } from '../../core/entities/product';
 import { StaffMember } from '../../core/entities/staff';
 import { SelectedModifier } from '../../core/entities/order';
 import { usePosStore } from '../../presentation/store/pos-store';
+import { useAuthStore } from '../../presentation/store/auth-store';
 import { useCashierShortcuts } from '../../presentation/hooks/useCashierShortcuts';
 
 export default function PosCashierPage() {
+  const router = useRouter();
   const { addToCart, cart } = usePosStore();
+  const { isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   // Modals state
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
@@ -74,6 +84,14 @@ export default function PosCashierPage() {
       setActiveServiceProduct(null);
     }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-slate-950 text-slate-400 text-xs">
+        Mengarahkan ke halaman login...
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-900 text-slate-100">

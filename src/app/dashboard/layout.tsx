@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -16,12 +16,30 @@ import {
   ClipboardList,
   Utensils,
   UserCheck,
+  LogOut,
+  Store,
+  ChevronDown,
 } from 'lucide-react';
 import { useBusinessStore } from '../../presentation/store/business-store';
+import { useAuthStore } from '../../presentation/store/auth-store';
+import { DEMO_TENANTS } from '../../core/entities/user';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { config } = useBusinessStore();
+  const { currentUser, logout, activeOutlet, switchOutlet } = useAuthStore();
+
+  React.useEffect(() => {
+    if (!currentUser) {
+      router.push('/login');
+    }
+  }, [currentUser, router]);
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
 
   const navigation = [
     { name: 'Ringkasan & Metrik', href: '/dashboard', icon: LayoutDashboard },
@@ -35,10 +53,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Pengaturan PT Vistara', href: '/dashboard/settings', icon: Settings },
   ];
 
+  if (!currentUser) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-slate-950 text-slate-400 text-xs">
+        Mengarahkan ke halaman login...
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between select-none">
+      <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between select-none shrink-0">
         <div className="flex-1 overflow-y-auto">
           {/* Brand */}
           <div className="p-4 border-b border-slate-800">
@@ -55,6 +81,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* SaaS Multi-Outlet / Branch Selector */}
+          <div className="p-3 border-b border-slate-800/80 bg-slate-950/40">
+            <div className="text-[10px] uppercase font-bold text-slate-400 mb-1 flex items-center gap-1">
+              <Store className="w-3 h-3 text-cyan-400" />
+              <span>Cabang Outlet Aktif</span>
+            </div>
+            <select
+              value={activeOutlet.id}
+              onChange={(e) => {
+                const found = DEMO_TENANTS.find((o) => o.id === e.target.value);
+                if (found) switchOutlet(found);
+              }}
+              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500 transition truncate"
+            >
+              {DEMO_TENANTS.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Quick Return to POS Terminal */}
@@ -78,7 +126,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition ${
+                  className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition ${
                     isActive
                       ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 font-semibold'
                       : item.highlight
@@ -94,13 +142,41 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
         </div>
 
-        {/* Footer info */}
-        <div className="p-4 border-t border-slate-800 text-[11px] text-slate-500 space-y-1 bg-slate-950/40">
-          <div className="flex items-center gap-1 text-slate-400">
-            <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="font-medium">PT Vistara Teknologi Indonesia</span>
+        {/* User profile & Logout footer */}
+        <div className="p-3 border-t border-slate-800 bg-slate-950/60 space-y-2">
+          {currentUser ? (
+            <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-900 border border-slate-800">
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-500 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                  {currentUser.avatarInitials}
+                </div>
+                <div className="overflow-hidden">
+                  <div className="text-xs font-bold text-white truncate">{currentUser.name}</div>
+                  <div className="text-[10px] text-cyan-400 truncate">{currentUser.roleLabel}</div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleLogout}
+                title="Keluar / Ganti Akun"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="w-full block py-2 text-center rounded-xl bg-blue-600 text-xs font-bold text-white hover:bg-blue-500"
+            >
+              Masuk ke Akun
+            </Link>
+          )}
+
+          <div className="flex items-center justify-between text-[10px] text-slate-500 px-1">
+            <span>PT Vistara Teknologi Indonesia</span>
+            <span>v2.5.0-PRO</span>
           </div>
-          <div>Versi: {config.systemVersion}</div>
         </div>
       </aside>
 
