@@ -4,6 +4,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "VISTARA POS | PT Vistara Teknologi Indonesia",
   description: "Universal Omni-Industry Point of Sale Engine by PT VISTARA TEKNOLOGI INDONESIA. Supporting Retail, F&B, Services, and Wholesale.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
