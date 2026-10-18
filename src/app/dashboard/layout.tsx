@@ -12,8 +12,10 @@ import {
   Settings,
   ShieldCheck,
   ArrowLeft,
-  Store,
-  Layers,
+  BarChart3,
+  ClipboardList,
+  Utensils,
+  UserCheck,
 } from 'lucide-react';
 import { useBusinessStore } from '../../presentation/store/business-store';
 
@@ -23,17 +25,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navigation = [
     { name: 'Ringkasan & Metrik', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Katalog Produk & Stok', href: '/dashboard/products', icon: Package },
-    { name: 'Riwayat Transaksi', href: '/dashboard/orders', icon: Receipt },
+    { name: 'Laporan & Analitik Bisnis', href: '/dashboard/reports', icon: BarChart3, highlight: true },
+    { name: 'Katalog Produk & Harga', href: '/dashboard/products', icon: Package },
+    { name: 'Stok Opname & Mutasi', href: '/dashboard/inventory', icon: ClipboardList },
+    { name: 'Riwayat Transaksi & Struk', href: '/dashboard/orders', icon: Receipt },
     { name: 'Pelanggan & Kasbon', href: '/dashboard/customers', icon: Users },
-    { name: 'Pengaturan Sistem', href: '/dashboard/settings', icon: Settings },
+    { name: 'Staf & Bagi Hasil Komisi', href: '/dashboard/staff', icon: UserCheck },
+    { name: 'Denah Meja Resto & Cafe', href: '/dashboard/tables', icon: Utensils },
+    { name: 'Pengaturan PT Vistara', href: '/dashboard/settings', icon: Settings },
   ];
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100">
       {/* Sidebar */}
       <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between select-none">
-        <div>
+        <div className="flex-1 overflow-y-auto">
           {/* Brand */}
           <div className="p-4 border-b border-slate-800">
             <div className="flex items-center gap-3">
@@ -51,7 +57,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
 
-          {/* Quick Return to POS */}
+          {/* Quick Return to POS Terminal */}
           <div className="p-3">
             <Link
               href="/"
@@ -75,6 +81,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition ${
                     isActive
                       ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 font-semibold'
+                      : item.highlight
+                      ? 'text-cyan-300 hover:text-white hover:bg-slate-850 bg-cyan-950/20 border border-cyan-800/30'
                       : 'text-slate-400 hover:text-white hover:bg-slate-850'
                   }`}
                 >
@@ -87,7 +95,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Footer info */}
-        <div className="p-4 border-t border-slate-800 text-[11px] text-slate-500 space-y-1">
+        <div className="p-4 border-t border-slate-800 text-[11px] text-slate-500 space-y-1 bg-slate-950/40">
           <div className="flex items-center gap-1 text-slate-400">
             <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
             <span className="font-medium">PT Vistara Teknologi Indonesia</span>

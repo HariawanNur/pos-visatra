@@ -12,6 +12,7 @@ import { TableSelectModal } from '../../presentation/components/cashier/TableSel
 import { CustomerSelectModal } from '../../presentation/components/cashier/CustomerSelectModal';
 import { ShiftModal } from '../../presentation/components/cashier/ShiftModal';
 import { ShortcutHelpModal } from '../../presentation/components/cashier/ShortcutHelpModal';
+import { PettyCashModal } from '../../presentation/components/cashier/PettyCashModal';
 import { Product } from '../../core/entities/product';
 import { StaffMember } from '../../core/entities/staff';
 import { SelectedModifier } from '../../core/entities/order';
@@ -27,6 +28,7 @@ export default function PosCashierPage() {
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
   const [isShortcutHelpOpen, setIsShortcutHelpOpen] = useState(false);
+  const [isPettyCashOpen, setIsPettyCashOpen] = useState(false);
 
   // Active product for modifier or service staff modal
   const [activeModifierProduct, setActiveModifierProduct] = useState<Product | null>(null);
@@ -45,6 +47,7 @@ export default function PosCashierPage() {
       setIsCustomerModalOpen(false);
       setIsShiftModalOpen(false);
       setIsShortcutHelpOpen(false);
+      setIsPettyCashOpen(false);
       setActiveModifierProduct(null);
       setActiveServiceProduct(null);
     },
@@ -78,6 +81,7 @@ export default function PosCashierPage() {
       <CashierHeader
         onOpenShiftModal={() => setIsShiftModalOpen(true)}
         onOpenShortcutHelp={() => setIsShortcutHelpOpen(true)}
+        onOpenPettyCashModal={() => setIsPettyCashOpen(true)}
       />
 
       {/* 2. Main POS Workspace: Left Catalog + Right Cart */}
@@ -136,6 +140,11 @@ export default function PosCashierPage() {
       <ShortcutHelpModal
         isOpen={isShortcutHelpOpen}
         onClose={() => setIsShortcutHelpOpen(false)}
+      />
+
+      <PettyCashModal
+        isOpen={isPettyCashOpen}
+        onClose={() => setIsPettyCashOpen(false)}
       />
     </div>
   );

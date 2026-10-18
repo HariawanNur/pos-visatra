@@ -13,6 +13,7 @@ import {
   Clock,
   Keyboard,
   ShieldCheck,
+  Wallet,
 } from 'lucide-react';
 import { usePosStore } from '../../store/pos-store';
 import { useBusinessStore } from '../../store/business-store';
@@ -21,11 +22,13 @@ import { IndustryMode } from '../../../core/types/industry';
 interface CashierHeaderProps {
   onOpenShiftModal: () => void;
   onOpenShortcutHelp: () => void;
+  onOpenPettyCashModal: () => void;
 }
 
 export const CashierHeader: React.FC<CashierHeaderProps> = ({
   onOpenShiftModal,
   onOpenShortcutHelp,
+  onOpenPettyCashModal,
 }) => {
   const { industryMode, setIndustryMode } = usePosStore();
   const { config, currentShift } = useBusinessStore();
@@ -86,6 +89,16 @@ export const CashierHeader: React.FC<CashierHeaderProps> = ({
 
       {/* Action Controls & Cashier Info */}
       <div className="flex items-center gap-2">
+        {/* Petty Cash Button */}
+        <button
+          onClick={onOpenPettyCashModal}
+          title="Kas Kecil / Pengeluaran Toko"
+          className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition flex items-center gap-1.5 text-xs"
+        >
+          <Wallet className="w-4 h-4 text-emerald-400" />
+          <span className="hidden sm:inline">Kas Kecil</span>
+        </button>
+
         {/* Keyboard shortcut help */}
         <button
           onClick={onOpenShortcutHelp}

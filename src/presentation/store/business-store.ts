@@ -11,6 +11,9 @@ import {
   INITIAL_CUSTOMERS,
   INITIAL_TABLES,
   INITIAL_STAFF,
+  INITIAL_ORDERS,
+  INITIAL_INVENTORY_LOGS,
+  InventoryLog,
 } from '../../infrastructure/repositories/mock-data';
 
 interface BusinessState {
@@ -20,23 +23,41 @@ interface BusinessState {
   tables: RestaurantTable[];
   staff: StaffMember[];
   orders: Order[];
+  inventoryLogs: InventoryLog[];
   currentShift: Shift | null;
 
-  // Actions
+  // Actions - Config
   updateConfig: (newConfig: Partial<BusinessConfig>) => void;
+
+  // Actions - Products & Inventory
   addProduct: (product: Product) => void;
   updateProduct: (id: string, product: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
   updateProductStock: (productId: string, quantityDeduction: number) => void;
+  addInventoryLog: (log: Omit<InventoryLog, 'id' | 'date'>) => void;
 
+  // Actions - Customers & Kasbon
   addCustomer: (customer: Customer) => void;
   updateCustomerKasbon: (customerId: string, amountAdded: number) => void;
 
+  // Actions - Tables (F&B)
+  addTable: (table: RestaurantTable) => void;
+  updateTable: (id: string, updated: Partial<RestaurantTable>) => void;
+  deleteTable: (id: string) => void;
   updateTableStatus: (tableId: string, status: RestaurantTable['status'], orderId?: string) => void;
+
+  // Actions - Staff (Services & Commissions)
+  addStaff: (member: StaffMember) => void;
+  updateStaff: (id: string, updated: Partial<StaffMember>) => void;
+  deleteStaff: (id: string) => void;
+
+  // Actions - Orders & Transactions
   addOrder: (order: Order) => void;
 
+  // Actions - Shift & Petty Cash
   openShift: (cashierName: string, initialCash: number) => void;
   closeShift: (actualCash: number, notes?: string) => void;
+  addCashMovement: (type: 'IN' | 'OUT', amount: number, reason: string) => void;
 }
 
 export const useBusinessStore = create<BusinessState>((set) => ({
@@ -45,18 +66,19 @@ export const useBusinessStore = create<BusinessState>((set) => ({
   customers: INITIAL_CUSTOMERS,
   tables: INITIAL_TABLES,
   staff: INITIAL_STAFF,
-  orders: [],
+  orders: INITIAL_ORDERS,
+  inventoryLogs: INITIAL_INVENTORY_LOGS,
   currentShift: {
     id: 'shf_demo_01',
     cashierName: 'Siti Rahmawati',
-    openedAt: new Date(Date.now() - 3600000 * 4).toISOString(), // 4 hours ago
+    openedAt: new Date(Date.now() - 3600000 * 4).toISOString(),
     status: 'OPEN',
     initialCash: 500000,
-    cashSalesTotal: 1850000,
-    nonCashSalesTotal: 2450000,
+    cashSalesTotal: 98790,
+    nonCashSalesTotal: 146520 + 155400 + 4834050,
     cashIn: 0,
     cashOut: 50000, // kas kecil beli air galon
-    expectedCashTotal: 500000 + 1850000 - 50000,
+    expectedCashTotal: 500000 + 98790 - 50000,
   },
 
   updateConfig: (newConfig) =>
@@ -82,14 +104,58 @@ export const useBusinessStore = create<BusinessState>((set) => ({
       ),
     })),
 
+  addInventoryLog: (log) =>
+    set((state) => {
+      const product = state.products.find((p) => p.id === log.productId);
+      if (!product) return state;
+
+      let newStock = product.stock;
+      if (log.type === 'IN') {
+        newStock += log.quantity;
+      } else if (log.type === 'OUT' || log.type === 'DAMAGE') {
+        newStock = Math.max(0, newStock - log.quantity);
+      } else if (log.type === 'ADJUSTMENT') {
+        newStock = log.quantity; // direct override
+      }
+
+      const newLogRecord: InventoryLog = {
+        ...log,
+        id: `log_${Date.now()}`,
+        currentStock: newStock,
+        date: new Date().toISOString(),
+      };
+
+      const updatedProducts = state.products.map((p) =>
+        p.id === log.productId ? { ...p, stock: newStock } : p
+      );
+
+      return {
+        products: updatedProducts,
+        inventoryLogs: [newLogRecord, ...state.inventoryLogs],
+      };
+    }),
+
   addCustomer: (customer) =>
     set((state) => ({ customers: [customer, ...state.customers] })),
 
   updateCustomerKasbon: (customerId, amountAdded) =>
     set((state) => ({
       customers: state.customers.map((c) =>
-        c.id === customerId ? { ...c, kasbonBalance: c.kasbonBalance + amountAdded } : c
+        c.id === customerId ? { ...c, kasbonBalance: Math.max(0, c.kasbonBalance + amountAdded) } : c
       ),
+    })),
+
+  addTable: (table) =>
+    set((state) => ({ tables: [...state.tables, table] })),
+
+  updateTable: (id, updated) =>
+    set((state) => ({
+      tables: state.tables.map((t) => (t.id === id ? { ...t, ...updated } : t)),
+    })),
+
+  deleteTable: (id) =>
+    set((state) => ({
+      tables: state.tables.filter((t) => t.id !== id),
     })),
 
   updateTableStatus: (tableId, status, orderId) =>
@@ -99,9 +165,21 @@ export const useBusinessStore = create<BusinessState>((set) => ({
       ),
     })),
 
+  addStaff: (member) =>
+    set((state) => ({ staff: [...state.staff, member] })),
+
+  updateStaff: (id, updated) =>
+    set((state) => ({
+      staff: state.staff.map((s) => (s.id === id ? { ...s, ...updated } : s)),
+    })),
+
+  deleteStaff: (id) =>
+    set((state) => ({
+      staff: state.staff.filter((s) => s.id !== id),
+    })),
+
   addOrder: (order) =>
     set((state) => {
-      // Deduct stock for all items
       const updatedProducts = state.products.map((p) => {
         const itemInOrder = order.items.find((it) => it.productId === p.id);
         if (itemInOrder && !p.isService) {
@@ -110,7 +188,6 @@ export const useBusinessStore = create<BusinessState>((set) => ({
         return p;
       });
 
-      // Update kasbon if tempo
       let updatedCustomers = state.customers;
       if (order.paymentMethod === 'TEMPO_KASBON' && order.customer) {
         updatedCustomers = state.customers.map((c) =>
@@ -119,6 +196,20 @@ export const useBusinessStore = create<BusinessState>((set) => ({
             : c
         );
       }
+
+      // Update Staff Commission today if service items exist
+      let updatedStaff = state.staff;
+      order.items.forEach((item) => {
+        if (item.assignedStaffId) {
+          const staffMember = updatedStaff.find((s) => s.id === item.assignedStaffId);
+          if (staffMember) {
+            const earned = Math.round((item.subtotal * (staffMember.commissionPercentage || 0)) / 100);
+            updatedStaff = updatedStaff.map((s) =>
+              s.id === staffMember.id ? { ...s, totalEarningsToday: s.totalEarningsToday + earned } : s
+            );
+          }
+        }
+      });
 
       // Update Shift totals
       let updatedShift = state.currentShift;
@@ -137,6 +228,7 @@ export const useBusinessStore = create<BusinessState>((set) => ({
         orders: [order, ...state.orders],
         products: updatedProducts,
         customers: updatedCustomers,
+        staff: updatedStaff,
         currentShift: updatedShift,
       };
     }),
@@ -169,6 +261,29 @@ export const useBusinessStore = create<BusinessState>((set) => ({
           actualClosingCash: actualCash,
           cashDifference: actualCash - expected,
           notes,
+        },
+      };
+    }),
+
+  addCashMovement: (type, amount, reason) =>
+    set((state) => {
+      if (!state.currentShift || state.currentShift.status !== 'OPEN') return state;
+      const isCashIn = type === 'IN';
+      const newCashIn = state.currentShift.cashIn + (isCashIn ? amount : 0);
+      const newCashOut = state.currentShift.cashOut + (!isCashIn ? amount : 0);
+      const newExpected =
+        state.currentShift.initialCash +
+        state.currentShift.cashSalesTotal +
+        newCashIn -
+        newCashOut;
+
+      return {
+        currentShift: {
+          ...state.currentShift,
+          cashIn: newCashIn,
+          cashOut: newCashOut,
+          expectedCashTotal: newExpected,
+          notes: `${state.currentShift.notes || ''} [${type}: ${amount} - ${reason}]`,
         },
       };
     }),
