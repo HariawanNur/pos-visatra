@@ -50,19 +50,9 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
-  // Default session active for smooth client demo out of the box
-  currentUser: {
-    id: 'usr_owner_01',
-    name: 'Arya Wicaksana, M.Kom',
-    email: 'owner@vistara.co.id',
-    role: 'SUPERADMIN',
-    roleLabel: 'Owner / CEO Vistara',
-    tenantId: 'tenant_vistara_global',
-    tenantName: 'PT VISTARA TEKNOLOGI INDONESIA',
-    activeOutlet: DEMO_TENANTS[0],
-    avatarInitials: 'AW',
-  },
-  isAuthenticated: true,
+  // Default to null/false so users land on the Login page first
+  currentUser: null,
+  isAuthenticated: false,
   activeOutlet: DEMO_TENANTS[0],
 
   login: (email, password, outletId) => {

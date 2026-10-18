@@ -19,10 +19,10 @@ export const ThermalReceiptModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/85 backdrop-blur-sm animate-in fade-in duration-150">
       <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
         {/* Modal Top Actions */}
-        <div className="p-3 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+        <div className="p-3 border-b border-slate-800 flex items-center justify-between bg-slate-950 shrink-0">
           <div className="flex items-center gap-2 text-emerald-400 font-semibold text-xs">
             <Check className="w-4 h-4" />
             <span>Transaksi Berhasil</span>
@@ -184,7 +184,7 @@ export const ThermalReceiptModal: React.FC = () => {
         </div>
 
         {/* Modal Bottom Buttons */}
-        <div className="p-4 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
+        <div className="p-3 sm:p-4 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-2.5 sm:gap-3 shrink-0">
           <button
             onClick={closeReceiptModal}
             className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition"

@@ -31,10 +31,10 @@ export const TableSelectModal: React.FC<TableSelectModalProps> = ({ isOpen, onCl
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="bg-slate-900 border border-slate-800 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+      <div className="bg-slate-900 border border-slate-800 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[85vh]">
         {/* Header */}
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+        <div className="p-3.5 sm:p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950 shrink-0">
           <div>
             <h3 className="font-bold text-base text-white">Pilih Meja Resto & Cafe</h3>
             <p className="text-xs text-slate-400">Pilih nomor meja tamu untuk pesanan Dine-In</p>
@@ -48,7 +48,7 @@ export const TableSelectModal: React.FC<TableSelectModalProps> = ({ isOpen, onCl
         </div>
 
         {/* Zone Filters */}
-        <div className="px-4 py-2.5 border-b border-slate-800/80 bg-slate-950/60 flex gap-2 overflow-x-auto">
+        <div className="px-3.5 sm:px-4 py-2 border-b border-slate-800/80 bg-slate-950/60 flex gap-2 overflow-x-auto scrollbar-none shrink-0">
           {zones.map((zone) => (
             <button
               key={zone}

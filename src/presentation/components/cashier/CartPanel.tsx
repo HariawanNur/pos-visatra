@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   ArrowRight,
   Sparkles,
+  X,
 } from 'lucide-react';
 import { usePosStore } from '../../store/pos-store';
 import { useBusinessStore } from '../../store/business-store';
@@ -23,12 +24,16 @@ interface CartPanelProps {
   onOpenPaymentModal: () => void;
   onOpenTableModal: () => void;
   onOpenCustomerModal: () => void;
+  onCloseMobile?: () => void;
+  isMobileDrawer?: boolean;
 }
 
 export const CartPanel: React.FC<CartPanelProps> = ({
   onOpenPaymentModal,
   onOpenTableModal,
   onOpenCustomerModal,
+  onCloseMobile,
+  isMobileDrawer = false,
 }) => {
   const {
     cart,
@@ -47,6 +52,11 @@ export const CartPanel: React.FC<CartPanelProps> = ({
   const { config } = useBusinessStore();
   const totals = getTotals();
 
+  const handlePay = () => {
+    if (onCloseMobile) onCloseMobile();
+    onOpenPaymentModal();
+  };
+
   const dineTypeOptions: { type: DineType; label: string }[] = [
     { type: 'DINE_IN', label: 'Dine In' },
     { type: 'TAKEAWAY', label: 'Take Away' },
@@ -54,9 +64,39 @@ export const CartPanel: React.FC<CartPanelProps> = ({
   ];
 
   return (
-    <div className="w-full lg:w-[420px] bg-slate-950 border-l border-slate-800 flex flex-col h-full select-none">
+    <div
+      className={`w-full ${
+        isMobileDrawer
+          ? 'h-full bg-slate-950 flex flex-col'
+          : 'lg:w-[420px] bg-slate-950 border-l border-slate-800 flex flex-col h-full'
+      } select-none`}
+    >
+      {/* Mobile Drawer Grab Handle & Header */}
+      {isMobileDrawer && (
+        <div className="p-3 pb-2 border-b border-slate-800 bg-slate-950 flex flex-col items-center shrink-0">
+          <div className="w-10 h-1 bg-slate-700 rounded-full mb-2" />
+          <div className="w-full flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <h3 className="font-bold text-sm text-white">
+                Keranjang Pesanan ({totals.itemCount} Item)
+              </h3>
+            </div>
+            {onCloseMobile && (
+              <button
+                onClick={onCloseMobile}
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                aria-label="Tutup Keranjang"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Top Context Bar: Customer, Table, DineType */}
-      <div className="p-3.5 border-b border-slate-800 bg-slate-900/40 space-y-2.5">
+      <div className="p-3.5 border-b border-slate-800 bg-slate-900/40 space-y-2.5 shrink-0">
         <div className="flex items-center justify-between gap-2">
           {/* Customer Button */}
           <button
@@ -268,7 +308,7 @@ export const CartPanel: React.FC<CartPanelProps> = ({
           </button>
 
           <button
-            onClick={onOpenPaymentModal}
+            onClick={handlePay}
             disabled={cart.length === 0}
             className="col-span-3 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition duration-150 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed"
           >

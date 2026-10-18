@@ -79,42 +79,42 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="bg-slate-900 border border-slate-750 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+      <div className="bg-slate-900 border border-slate-750 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh]">
         {/* Modal Header */}
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+        <div className="p-3.5 sm:p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950 shrink-0">
           <div>
-            <h3 className="font-bold text-lg text-white">Pembayaran & Selesai</h3>
-            <p className="text-xs text-slate-400">
+            <h3 className="font-bold text-base sm:text-lg text-white">Pembayaran & Selesai</h3>
+            <p className="text-[11px] sm:text-xs text-slate-400">
               {config.companyLegalName} • {config.storeName}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto space-y-5">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-4 sm:space-y-5">
           {/* Total Due Banner */}
-          <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+          <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <span className="text-xs uppercase tracking-wider text-slate-400 font-medium">
+              <span className="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-medium">
                 Total Tagihan
               </span>
-              <div className="text-3xl font-black text-emerald-400">
+              <div className="text-2xl sm:text-3xl font-black text-emerald-400">
                 {formatRupiah(totals.grandTotal)}
               </div>
             </div>
             {selectedCustomer && (
-              <div className="text-right">
-                <span className="text-[11px] text-slate-400">Pelanggan</span>
-                <div className="text-sm font-semibold text-white">{selectedCustomer.name}</div>
+              <div className="sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-850">
+                <span className="text-[10px] sm:text-[11px] text-slate-400">Pelanggan</span>
+                <div className="text-xs sm:text-sm font-semibold text-white">{selectedCustomer.name}</div>
                 {selectedCustomer.allowKasbon && (
-                  <div className="text-xs text-amber-400">
+                  <div className="text-[11px] sm:text-xs text-amber-400">
                     Sisa Limit Kasbon: {formatRupiah(selectedCustomer.kasbonLimit - selectedCustomer.kasbonBalance)}
                   </div>
                 )}
@@ -290,10 +290,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-3">
+        <div className="p-3 sm:p-4 border-t border-slate-800 bg-slate-950 flex items-center justify-between gap-2.5 sm:gap-3 shrink-0">
           <button
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition"
+            className="px-3 sm:px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition"
           >
             Batal
           </button>
@@ -301,9 +301,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose }) =
           <button
             onClick={handleConfirmPayment}
             disabled={paymentMethod === 'CASH' && cashReceived < totals.grandTotal}
-            className="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <Printer className="w-4 h-4" />
+            <Printer className="w-4 h-4 shrink-0" />
             <span>Selesaikan & Cetak Struk</span>
           </button>
         </div>
